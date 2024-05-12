@@ -50,9 +50,11 @@ class TaskController extends Controller
         $data = $request->validated();
         $data['user_id'] = auth()->id();
 
-        Task::query()->create($data);
+        $task = Task::query()->create($data);
 
-        return $this->sendSuccess();
+        return $this->sendResponse(
+            TaskResource::make($task)
+        );
     }
 
     /**
