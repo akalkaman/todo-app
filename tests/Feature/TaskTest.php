@@ -109,4 +109,31 @@ class TaskTest extends TestCase
 
         $response->assertOk();
     }
+
+    public function test_delete()
+    {
+        $user = User::factory()->create();
+
+        $task_1 = $this->actingAs($user)->postJson('/api/tasks', [
+            'name' => 'Task 1',
+        ]);
+
+        $task_2 = $this->actingAs($user)->postJson('/api/tasks', [
+            'name' => 'Task 2',
+        ]);
+
+        $task_1_id = json_decode($task_1->getContent())->data->id;
+
+        $response = $this->delete('/api/tasks/' . $task_1_id);
+
+        $this->assertDatabaseMissing('tasks', [
+            'name' => 'Task 1',
+        ]);
+
+        $this->assertDatabaseHas('tasks', [
+            'name' => 'Task 2'
+        ]);
+
+        $response->assertOk();
+    }
 }
