@@ -19,7 +19,7 @@ class AuthController extends Controller
 
         User::query()->create($data);
 
-        return response()->json();
+        return $this->sendSuccess();
     }
 
     public function login(Request $request)
@@ -32,13 +32,15 @@ class AuthController extends Controller
         );
 
         if ($token = auth()->attempt($data)) {
-            return response()->json([
-                'access_token' => $token,
-                'token_type' => 'bearer',
-                'expires_in' => auth()->guard()->factory()->getTTL() * 60
-            ]);
+            return $this->sendResponse(
+                [
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => auth()->guard()->factory()->getTTL() * 60
+                ]
+            );
         }
 
-        return response()->json(['error' => 'Unauthorized'], 401);
+        return $this->sendError('Unauthorized', 401);
     }
 }
